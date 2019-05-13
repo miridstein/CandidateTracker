@@ -1,0 +1,18 @@
+﻿@using CandidateTracker.Data
+@model IEnumerable<Candidate>
+<h2>Confirmed Candidates</h2>
+<table class="table table-hover table-bordered table-striped">
+    <tr>
+        <th>Name</th>
+        <th>Phone</th>
+        <th>Email</th>
+    </tr>
+    @foreach (Candidate candidate in Model)
+    {
+        <tr>
+            <td>@candidate.Name</td>
+            <td>@candidate.Phone</td>
+            <td>@candidate.Email</td>
+        </tr>
+    }
+</table>

@@ -5,39 +5,68 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using _5_6_19candidatetracker.Models;
+using CandidateTracker.Data;
+using Microsoft.Extensions.Configuration;
 
 namespace _5_6_19candidatetracker.Controllers
 {
     public class HomeController : Controller
     {
+        private string _connectionString;
+
+        public HomeController(IConfiguration configuration )
+        {
+            _connectionString = configuration.GetConnectionString("ConStr");
+        }
+        public IActionResult AddCandidateToDb(Candidate c)
+        {
+            var repo = new CandidateRepository(_connectionString);
+            repo.AddCandidate(c);
+            return Redirect("/home/index");
+        }
+        public IActionResult AddCandidate()
+        {
+            return View();
+        }
         public IActionResult Index()
         {
             return View();
         }
 
-        public IActionResult About()
+        public IActionResult PendingView()
         {
-            ViewData["Message"] = "Your application description page.";
-
-            return View();
+            var repo = new CandidateRepository(_connectionString);
+           IEnumerable<Candidate> candies= repo.GetPendingCandidates();
+            return View(candies);
         }
 
-        public IActionResult Contact()
+        public IActionResult ConfirmedView()
         {
-            ViewData["Message"] = "Your contact page.";
-
-            return View();
+            var repo = new CandidateRepository(_connectionString);
+            IEnumerable<Candidate> candies = repo.GetConfirmedCandidates();
+            return View(candies);
         }
-
-        public IActionResult Privacy()
+        public IActionResult DeclinedView()
         {
-            return View();
+            var repo = new CandidateRepository(_connectionString);
+            IEnumerable<Candidate> candies = repo.GetDeclinedCandidates();
+            return View(candies);
         }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        public IActionResult CandidateDetails(int id)
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            var repo = new CandidateRepository(_connectionString);
+           Candidate c=  repo.GetCandidate(id);
+            return View(c);
+                    }
+        public void ConfirmCandidate(int id)
+        {
+            var repo = new CandidateRepository(_connectionString);
+            repo.ConfirmCandidate(id);
+        }
+        public void DeclineCandidate(int id)
+        {
+            var repo = new CandidateRepository(_connectionString);
+            repo.DeclineCandidate(id);
         }
     }
 }
